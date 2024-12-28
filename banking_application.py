@@ -26,10 +26,10 @@ class BankApplication:
         if self.bank=={}:
             print("\nPlease create the bank account first!")
         else:
-            acc_number=input("\nWhich account number's balance you want to check:")
+            acc_number=input("\nEnter the account number in which you want to deposit the money:")
             while len(acc_number)<5:
                 print("\nPlease enter the entire account number!")
-                acc_number=input("\nWhich account number's balance you want to check:")
+                acc_number=input("\nEnter the account number in which you want to deposit the money:")
             try:
                 found=None
                 for i in self.bank:
@@ -57,11 +57,11 @@ class BankApplication:
         if self.bank=={}:
             print("\nPlease create the bank account first!")
         else:
-            acc_number=input("\nWhich account number's balance you want to check:")
+            acc_number=input("\nEnter the account number from which account you want to withdraw the money:")
             
             while len(acc_number)<5:
                 print("\nPlease enter the entire account number!")
-                acc_number=input("\nWhich account number's balance you want to check:")
+                acc_number=input("\nEnter the account number from which account you want to withdraw the money:")
             try:
                 found=None
                 
