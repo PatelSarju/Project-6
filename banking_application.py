@@ -1,5 +1,6 @@
 class InsufficientFundsError(Exception):
-    pass
+    def __str__(self):
+        return "Your current balance is less than your desired withdrawal amount\nor you entered the negative withdrawal amount!"
 
 class BankApplication:
     print("Welcome to the Robust Banking System!")
@@ -7,47 +8,106 @@ class BankApplication:
         self.bank={}
         
     def create_account(self):
-        self.acc_name=input("\nEnter the your name:")
+        self.acc_number=input("\nEnter the your account number:")
+        for i in self.bank:
+            while int(self.acc_number)==i:
+                print("\nPlease enter your account number\nyour entered account number is associated with another person!")
+                self.acc_number=input("\nEnter the your account number:")
+        while len(self.acc_number)<5:
+            print("Please enter the entire your account number!")
+            self.acc_number=input("\nEnter the your account number:")
+        self.acc_name=input("Enter the your name:")
         self.acc_balance=int(input("Enter initial deposit amount:"))
-        assert self.acc_balance>=0, "You have to enter the positive amount!"
+        assert int(self.acc_balance)>=0, "You have to enter the positive amount!"
         print("Account Created Successfully!")
-        self.bank[self.acc_name]=self.acc_balance
+        self.bank[int(self.acc_number)]=[self.acc_name,self.acc_balance]
 
     def deposit_funds(self):
         if self.bank=={}:
             print("\nPlease create the bank account first!")
         else:
-            amount=int(input("\nEnter the amount which you want to deposit from your account:"))
+            acc_number=input("\nWhich account number's balance you want to check:")
+            while len(acc_number)<5:
+                print("\nPlease enter the entire account number!")
+                acc_number=input("\nWhich account number's balance you want to check:")
             try:
-                amount<0
-            except:
+                found=None
+                for i in self.bank:
+                    if int(acc_number)==i:
+                        found=i
+                
+                if found==None:
+                    print("\nYour entered account number is not found in the system!")
+                
+                if found!=None:
+                    amount=int(input("\nEnter the amount which you want to deposit from your account:"))
+                    
+                    assert amount>0
+            except AssertionError:
                 print("Please enter the positive number!")
             else:
-                self.acc_balance+=amount
-                print(f"Deposit Succssful!")
+                if found!=None:
+                    self.bank[found][1]+=amount
+                    print(f"Deposit Succssful!")
             finally:
-                print(f"Your new balance is {self.acc_balance}")
+                if found!=None:
+                    print(f"\nYour new balance is {self.bank[found][1]}")
 
     def withdraw_funds(self):
         if self.bank=={}:
             print("\nPlease create the bank account first!")
         else:
-            amount=int(input("\nEnter the amount which you want to withdraw from your account:"))
+            acc_number=input("\nWhich account number's balance you want to check:")
+            
+            while len(acc_number)<5:
+                print("\nPlease enter the entire account number!")
+                acc_number=input("\nWhich account number's balance you want to check:")
             try:
-                amount>self.acc_balance
-            except InsufficientFundsError:
-                print("Your balance is not enough for your desired withdrawal amount!")
+                found=None
+                
+                for i in self.bank:
+                    if i==int(acc_number):
+                        found=i
+                
+                if found==None:
+                    print("\nYour entered account number is not found in the system!")
+                
+                if found!=None:
+                    amount=int(input("\nEnter the amount which you want to withdraw from your account:"))
+                
+                    if amount>int(self.bank[found][1]) or amount<0:
+                        raise InsufficientFundsError
+            except InsufficientFundsError as e:
+                print(e)
             else:
-                self.acc_balance-=amount
-                print(f"Withdrawal successful!")
+                if found!=None:
+                    self.bank[found][1]-=amount
+                    print(f"\nWithdrawal successful!")
             finally:
-                print(f"Your new balance is {self.acc_balance}")
-
+                if found!=None:
+                    print(f"\nYour new balance is {self.bank[found][1]}")
+                
     def check_balance(self):
         if self.bank=={}:
-            print("\nPlease create the bank account first!")
+            print("\nBank has no records!")
         else:
-            print(f"Your current balance is {self.acc_balance}!")
+            acc_number=input("\nWhich account number's balance you want to check:")
+            while len(acc_number)<5:
+                print("\nPlease enter the entire account number!")
+                acc_number=input("\nWhich account number's balance you want to check:")
+            found=None
+            for i in self.bank:
+                if int(acc_number)==i:
+                    found=self.bank[i]
+            if found==None:
+                print("Your entered account number is not found in the system!")
+            if found!=None:
+                print(f"\nCurrent Balance in your account:{found[1]}")
+            
+    def check_records(self):
+        print()
+        for i,j in self.bank.items():
+            print(f"Account Number: {i}, Account Holder Name:{j[0]}, Current Balance:{j[1]}")
 
     def ask_user(self):
         while True:
@@ -56,7 +116,8 @@ class BankApplication:
             print("2. Deposit Funds")
             print("3. Withdraw Funds")
             print("4. Check Balance")
-            print("5. Exit")
+            print("5. Check Account Details")
+            print("6. Exit")
             choice=int(input("Enter your choice:"))
 
             if choice==1:
@@ -68,6 +129,8 @@ class BankApplication:
             elif choice==4:
                 self.check_balance()
             elif choice==5:
+                self.check_records()
+            elif choice==6:
                 break
             else:
                 print("Please enter the valid choice!")
